@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('brands', function (Blueprint $table) {
+            $table->id();
+            $table->integer('user_id');
+            $table->string('brand_name')->unique();
+            $table->string('image')->nullable();
+            $table->tinyInteger('is_mega_menu')->default('0');
+            $table->enum('status', ['Active', 'Inactive']);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('brands');
+    }
+};
