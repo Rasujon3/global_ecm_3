@@ -89,7 +89,6 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", () => {
-        console.log("🛒 Cart Modal Script Loaded (Optimized)");
 
         function triggerCartToggle(loadContent = true) {
             try {
@@ -147,7 +146,6 @@
                 const data = await res.json();
 
                 if (data.status) {
-                    console.log("✅ Cart updated:", data);
                     triggerCartToggle();
 
                     // 🧾 Update header cart count
@@ -284,8 +282,6 @@
                 updateCart(cart_id, qty);
             }
         });
-
-        console.log("✅ Cart quantity, subtotal & remove handlers ready");
     });
 </script>
 

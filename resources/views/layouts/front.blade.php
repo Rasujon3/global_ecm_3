@@ -56,7 +56,6 @@
             $(document).on('click', '.add-to-cart', function(e) {
                 e.preventDefault();
                 let product_id = $(this).data('id');
-                console.log('➕ Adding product:', product_id);
 
                 $.ajax({
                     url: "{{url('/add-to-cart')}}",
@@ -81,7 +80,6 @@
                             // Replace inner dropdown content
                             if (data.cart_html) {
                                 $('#akbar-cart-dropdown-box').html(data.cart_html);
-                                console.log('🔄 Cart HTML updated');
                             }
 
                             // Open cart

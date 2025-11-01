@@ -241,7 +241,6 @@
             var isSearchFocused = false;
 
             if (!searchInput) {
-                console.log('Mobile menu search input not found.');
                 return;
             }
 

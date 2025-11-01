@@ -187,7 +187,6 @@
                     data:{'order_id':order_id, 'status':status_val},
                     dataType:"json",
                     success:function(data) {
-                        console.log(data);
                         toastr.success(data.message);
 
                         $('.data-table').DataTable().ajax.reload(null, false);

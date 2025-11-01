@@ -322,7 +322,6 @@
         e.preventDefault();
         let put = "{{Session::put('page','checkout')}}";
         let get = "{{Session::get('page')}}";
-        console.log(get);
         // let redirectUrl;
         // $.ajax({
 
