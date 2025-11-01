@@ -14,6 +14,7 @@
         <i class="w-icon-heart"></i>
         <span class="wishlist-label d-lg-show">Wishlist</span>
     </a>
-    @include('fronts.components.cart-dropdown')
+{{--    @include('fronts.components.cart-dropdown')--}}
+    @include('fronts.components.cart-dropdown-2')
 </div>
 
