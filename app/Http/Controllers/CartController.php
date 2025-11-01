@@ -181,7 +181,7 @@ class CartController extends Controller
 
             // Get updated cart data
             $countCart = Cart::where('cart_session_id', Session::get('cart_session_id'))->count();
-            $cartData = $this->getCartHtml();
+            $cartData = $this->getCartHtml2();
 
             return response()->json([
                 'status' => true,
@@ -216,7 +216,7 @@ class CartController extends Controller
 
             // Get updated cart data
             $countCart = Cart::where('cart_session_id', Session::get('cart_session_id'))->count();
-            $cartData = $this->getCartHtml();
+            $cartData = $this->getCartHtml2();
 
             return response()->json([
                 'status' => true,
