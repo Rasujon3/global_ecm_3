@@ -35,7 +35,7 @@
                 </a>
                 <div class="price-box">
                     <span class="product-quantity">Price: </span>
-                    <span class="product-price">{{ discount($cart->product) }} BDT</span>
+                    <span class="product-price">{{ $cart->unit_total }} BDT</span>
                 </div>
                 <div class="input-group" id="quantity-form-group">
                     <input
