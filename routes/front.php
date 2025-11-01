@@ -16,6 +16,8 @@ Route::get('/', [FrontController::class, 'frontPage'])->name('home');
 //cart routes
 Route::get('/carts', [CartController::class, 'carts']);
 Route::post('/cart-update', [CartController::class, 'cartUpdate']);
+Route::get('/cart-delete/{id}', [CartController::class, 'cartDelete'])->name('cart.delete');
+Route::post('/cart-update-ajax', [CartController::class, 'cartUpdateAjax'])->name('cart.update.ajax');
 
 //product routes
 Route::get('/product-details/{id}', [FrontController::class, 'productDetails']);

@@ -38,7 +38,7 @@
                         />
                     </a>
                 </figure>
-                <div class="product-detail">
+                <div class="product-detail" id="product-detail-box">
                     <a href="{{ url('/product-details/'.$cart->product->id) }}" class="product-name">
                         {{ $cart->product->product_name }}
                     </a>
@@ -46,7 +46,7 @@
                         <span class="product-quantity">Price: </span>
                         <span class="product-price">{{ discount($cart->product) }} BDT</span>
                     </div>
-                    <div class="input-group">
+                    <div class="input-group" id="quantity-form-group">
                         <input
                             class="quantity form-control"
                             type="number"
@@ -58,10 +58,10 @@
                     </div>
                 </div>
 
-                <div class="discount">
+{{--                <div class="discount">--}}
 {{--                    <span>Save 20%</span>--}}
-                    <p>1000৳</p>
-                </div>
+{{--                    <p>1000৳</p>--}}
+{{--                </div>--}}
 
                 <button
                     class="btn btn-link btn-close"
@@ -101,6 +101,15 @@
     </div>
     <!-- End of Dropdown Box -->
 </div>
+
+<style>
+    #quantity-form-group {
+        width: 50% !important;
+    }
+    #product-detail-box {
+        padding-left: 5px !important;
+    }
+</style>
 
 @push('scripts')
 

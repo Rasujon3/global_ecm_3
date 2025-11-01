@@ -254,7 +254,8 @@ class AjaxController extends Controller
 
             $countCart = Cart::where('cart_session_id',$cart_session_id)->count();
             // Get rendered cart HTML + sum + count
-            $cartData = $this->getCartHtml();
+//            $cartData = $this->getCartHtml();
+            $cartData = $this->getCartHtml2();
 
             return response()->json([
                 'status' => true,
@@ -281,7 +282,8 @@ class AjaxController extends Controller
         {
             Cart::truncate();
             // Get rendered cart HTML + sum + count
-            $cartData = $this->getCartHtml();
+//            $cartData = $this->getCartHtml();
+            $cartData = $this->getCartHtml2();
 
             return response()->json([
                 'status' => true,
@@ -310,7 +312,8 @@ class AjaxController extends Controller
             $count = Cart::where('cart_session_id',Session::get('cart_session_id'))->count();
 
             // Get rendered cart HTML + sum + count
-            $cartData = $this->getCartHtml();
+//            $cartData = $this->getCartHtml();
+            $cartData = $this->getCartHtml2();
 
             return response()->json([
                 'status' => true,
@@ -411,6 +414,41 @@ class AjaxController extends Controller
             ];
         } catch (Exception $e) {
             Log::error('Error in getCartHtml : '.$e->getMessage(), [
+                'code' => $e->getCode(),
+                'line' => $e->getLine()
+            ]);
+
+            return [
+                'success' => false,
+                'html' => '',
+                'sum' => 0,
+                'count' => 0,
+            ];
+        }
+    }
+    public function getCartHtml2()
+    {
+        try {
+            $carts = Cart::with('product', 'productvariant', 'product.images')
+                ->where('cart_session_id', Session::get('cart_session_id'))
+                ->latest()
+                ->get();
+
+            $sum = Cart::where('cart_session_id', Session::get('cart_session_id'))
+                ->sum('unit_total');
+
+            // Render the partial (make sure this view path is correct)
+            #$view = view('fronts.components.cart-dropdown-2', compact('carts', 'sum'))->render();
+            $view = view('fronts.components.cart-dropdown-inner', compact('carts', 'sum'))->render();
+
+            return [
+                'success' => true,
+                'html' => $view,
+                'sum' => $sum,
+                'count' => $carts->count(),
+            ];
+        } catch (Exception $e) {
+            Log::error('Error in getCartHtml2 : '.$e->getMessage(), [
                 'code' => $e->getCode(),
                 'line' => $e->getLine()
             ]);

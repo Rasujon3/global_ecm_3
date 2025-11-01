@@ -13882,7 +13882,7 @@ aside .sp-sidebar-banner span {
   /*color: #999;*/
 }
 .product.product-cart .product-quantity::after {
-  content: "x";
+  /*content: "x";*/
   font-size: 1.8rem;
   font-weight: 400;
   margin-left: 0.7rem;

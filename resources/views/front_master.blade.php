@@ -53,7 +53,7 @@
     <link rel="stylesheet" type="text/css" href="{{asset('front/assets/css/demo1.min.css')}}">
 
     <!-- Default CSS -->
-{{--    <link rel="stylesheet" type="text/css" href="{{asset('front/assets/css/style.min.css')}}">--}}
+    <link rel="stylesheet" type="text/css" href="{{asset('front/assets/css/style.min.css')}}">
 
     <style>
         .login.sign-in:hover, .login.register:hover, .my-account:hover, .user-logout:hover {

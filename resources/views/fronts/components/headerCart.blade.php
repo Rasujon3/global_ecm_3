@@ -1,4 +1,4 @@
-<div class="header-right ml-4" id="header-right">
+<div class="header-right ml-4">
     <div class="header-call d-xs-show d-lg-flex align-items-center">
         <a href="tel:#{{ setting()->phone ?? '' }}" class="w-icon-call"></a>
         <div class="call-info d-lg-show">
@@ -14,7 +14,20 @@
         <i class="w-icon-heart"></i>
         <span class="wishlist-label d-lg-show">Wishlist</span>
     </a>
-{{--    @include('fronts.components.cart-dropdown')--}}
-    @include('fronts.components.cart-dropdown-2')
-</div>
 
+    <!-- Cart Dropdown Structure - Never replace this wrapper -->
+    <div class="dropdown cart-dropdown cart-offcanvas mr-0 mr-lg-2">
+        <div class="cart-overlay"></div>
+        <a href="#" class="cart-toggle label-down link">
+            <i class="w-icon-cart">
+                <span class="cart-count" id="cart-count">{{ $countCart ?? 0 }}</span>
+            </i>
+            <span class="cart-label">Cart</span>
+        </a>
+
+        <!-- ONLY THIS INNER PART GETS REPLACED -->
+        <div class="dropdown-box" id="akbar-cart-dropdown-box">
+            @include('fronts.components.cart-dropdown-inner')
+        </div>
+    </div>
+</div>
