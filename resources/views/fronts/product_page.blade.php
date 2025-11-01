@@ -245,6 +245,36 @@
                 });
             }
 
+            function triggerCartToggle(loadContent = true) {
+                try {
+                    const cartToggle = document.querySelector('.cart-toggle');
+
+                    if (!cartToggle) {
+                        console.warn('Cart toggle element not found');
+                        return false;
+                    }
+
+                    // Create and dispatch a real click event
+                    const clickEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true
+                    });
+
+                    cartToggle.dispatchEvent(clickEvent);
+
+                    // Optionally load cart content
+                    if (loadContent && typeof window.loadCartContent === 'function') {
+                        window.loadCartContent();
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error('Error triggering cart toggle:', error);
+                    return false;
+                }
+            }
+
             $(document).on('click', '.add-cart', function(e){
                 e.preventDefault();
                 let product_id = $(this).data('id');
@@ -271,6 +301,7 @@
                                 // if you want to ensure the new HTML has id #cart-dropdown-box:
                                 // $('#cart-dropdown-box').html(data.cart_html);
                                 rebindCartEvents(); // rebind events for new content
+                                triggerCartToggle();
                             }
 
                             toastr.success(data.message);

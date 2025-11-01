@@ -23,68 +23,35 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            console.log('🏠 Home page cart scripts loaded');
+            function triggerCartToggle(loadContent = true) {
+                try {
+                    const cartToggle = document.querySelector('.cart-toggle');
 
-            // ============ REFRESH CART FUNCTION ============
-            function refreshCart() {
-                $.ajax({
-                    url: "{{ route('get.cart.html') }}",
-                    type: "GET",
-                    success: function(res) {
-                        console.log('Cart refreshed:', res);
-                        if (res.status) {
-                            $('#akbar-cart-dropdown-box').html(res.html);
-                            $('.cart-count').text(res.count);
-                        } else {
-                            console.error('Cart update failed');
-                        }
-                    },
-                    error: function(err) {
-                        console.error('Cart refresh error:', err);
+                    if (!cartToggle) {
+                        console.warn('Cart toggle element not found');
+                        return false;
                     }
-                });
+
+                    // Create and dispatch a real click event
+                    const clickEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true
+                    });
+
+                    cartToggle.dispatchEvent(clickEvent);
+
+                    // Optionally load cart content
+                    if (loadContent && typeof window.loadCartContent === 'function') {
+                        window.loadCartContent();
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error('Error triggering cart toggle:', error);
+                    return false;
+                }
             }
-
-            // ============ UPDATE CART QUANTITY - MAKE IT GLOBAL ============
-            window.updateCartQuantity = function(cart_id, qty) {
-                console.log('🔄 updateCartQuantity called:', cart_id, qty);
-
-                $.ajax({
-                    url: "{{ url('/cart-update-ajax') }}",
-                    type: "POST",
-                    data: {
-                        cart_id: cart_id,
-                        qty: qty,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    dataType: "json",
-                    beforeSend: function() {
-                        console.log('⏳ Updating cart...');
-                    },
-                    success: function(data) {
-                        console.log('✅ Cart updated:', data);
-
-                        if (data.status) {
-                            // Update cart count
-                            $('#cart-count').text(data.cart_count);
-                            $('.cart-count').text(data.cart_count);
-
-                            // Update cart content
-                            if (data.cart_html) {
-                                $('#akbar-cart-dropdown-box').html(data.cart_html);
-                            }
-                        } else {
-                            toastr.error(data.message || 'Failed to update cart');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('❌ Error updating cart:', error);
-                        console.error('Response:', xhr.responseText);
-                        toastr.error('Failed to update cart quantity');
-                    }
-                });
-            };
-
             // ============ ADD TO CART ============
             $(document).on('click', '.add-to-cart', function(e) {
                 e.preventDefault();
@@ -121,6 +88,8 @@
                             $('.cart-dropdown').addClass('opened');
                             $('.cart-overlay').addClass('active');
                             $('body').addClass('cart-opened');
+
+                            triggerCartToggle();
 
                             toastr.success(data.message);
                         }

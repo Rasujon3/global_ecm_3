@@ -14034,7 +14034,7 @@ aside .sp-sidebar-banner span {
 @media (max-width: 479px) {
   .cart-dropdown.cart-offcanvas .dropdown-box {
     /*max-width: 28rem;*/
-      max-width: 34rem; /*akabar: modify*/
+      max-width: 28rem; /*akabar: modify*/
   }
 }
 /*------------------------------------------

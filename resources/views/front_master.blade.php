@@ -447,6 +447,9 @@
         <!-- End of Main -->
 
         @include('fronts.components.footer')
+
+        @include('fronts.components.cart-modal')
+
     </div>
     <!-- End of Page-wrapper-->
 

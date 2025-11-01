@@ -235,4 +235,23 @@ class CartController extends Controller
             ], 500);
         }
     }
+
+    public function getCartModal(Request $request)
+    {
+        $userId = auth()->id();
+
+        $cartItems = Cart::with('product','productvariant', 'product.images')->where('cart_session_id',Session::get('cart_session_id'))->latest()->get();
+
+        $countCart = $cartItems->count();
+
+        $sum = Cart::where('cart_session_id',Session::get('cart_session_id'))->sum('unit_total');
+
+        $html = view('fronts.components.cart-dropdown-inner', compact('cartItems', 'countCart', 'sum'))->render();
+
+        return response()->json([
+            'status' => true,
+            'html' => $html,
+            'count' => $countCart,
+        ]);
+    }
 }

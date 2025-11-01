@@ -18,6 +18,7 @@ Route::get('/carts', [CartController::class, 'carts']);
 Route::post('/cart-update', [CartController::class, 'cartUpdate']);
 Route::get('/cart-delete/{id}', [CartController::class, 'cartDelete'])->name('cart.delete');
 Route::post('/cart-update-ajax', [CartController::class, 'cartUpdateAjax'])->name('cart.update.ajax');
+Route::get('/get-cart-modal', [CartController::class, 'getCartModal'])->name('get.cart.modal');
 
 //product routes
 Route::get('/product-details/{id}', [FrontController::class, 'productDetails']);
