@@ -652,7 +652,7 @@ table {
 
 @media (max-width: 768px) {
   #scroll-top {
-    display: none;
+    /*display: none;*/
   }
 }
 .loading:not(.load-more-overlay),

@@ -1,4 +1,4 @@
-<div class="header-middle">
+<div class="header-middle header-middle-sticky sticky-content fix-top sticky-header">
     <div class="container">
         <div class="header-left mr-md-4">
             <a href="#" class="mobile-menu-toggle  w-icon-hamburger" aria-label="menu-toggle">
@@ -108,6 +108,22 @@
         font-size: 14px;
         color: #444;
         margin: 8px 0;
+    }
+
+    .header-middle {
+        position: relative;
+        z-index: 1050;
+        transition: all 0.3s ease;
+    }
+
+    .header-middle.sticky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        z-index: 1055;
     }
 </style>
 

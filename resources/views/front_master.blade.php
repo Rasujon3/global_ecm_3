@@ -712,5 +712,22 @@
             Wolmart.setCookie("hideNewsletterPopup", true, 7);
         });
     </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const headerTop = document.querySelector('.header-top');
+        const headerMiddle = document.querySelector('.header-middle');
+
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 80) {
+                headerTop?.classList.add('hide');
+                headerMiddle?.classList.add('sticky');
+            } else {
+                headerTop?.classList.remove('hide');
+                headerMiddle?.classList.remove('sticky');
+            }
+        });
+    });
+</script>
+
 
 </html>

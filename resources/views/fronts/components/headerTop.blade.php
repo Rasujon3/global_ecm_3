@@ -43,3 +43,19 @@
         </div>
     </div>
 </div>
+
+<style>
+    .header-top {
+        background-color: #e5757e !important;
+        color: #222222;
+        position: relative;
+        z-index: 1040;
+        transition: all 0.3s ease;
+    }
+
+    .header-top.hide {
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+    }
+</style>

@@ -1,4 +1,4 @@
-<div class="header-bottom sticky-content fix-top sticky-header has-dropdown">
+<div class="header-bottom has-dropdown">
     <div class="container">
         <div class="inner-wrap">
             <div class="header-left">
