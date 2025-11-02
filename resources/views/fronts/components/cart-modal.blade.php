@@ -247,7 +247,7 @@
 
                 let qty = parseInt(input.value) || 1;
                 if (qty > 1) qty -= 1;
-                if (qty === 1) return false;
+                // if (qty === 1) return false;
                 input.value = qty;
 
                 const unitPrice = parseFloat(priceEl.textContent);

@@ -63,7 +63,7 @@
             </button>
         </div>
     @empty
-        <p class="text-center py-3 mb-0">No cart-products in cart</p>
+        <p class="text-center py-3 mb-0">Your cart is empty.</p>
     @endforelse
 </div>
 
