@@ -9,10 +9,10 @@
     $sum = Cart::where('cart_session_id', $cartSession)->sum('unit_total');
 @endphp
 
-<div class="products">
+<div class="cart-products">
     @forelse($carts as $cart)
         <div class="product product-cart cart-item-row" id="cart_{{ $cart->id }}" data-cart-id="{{ $cart->id }}">
-            <figure class="product-media">
+            <figure class="cart-product-media">
                 <a href="{{ url('/product-details/'.$cart->product->id) }}">
                     <img
                         src="{{ URL::to($cart->product->images[0]->image ?? 'frontend/images/placeholder.png') }}"
@@ -63,7 +63,7 @@
             </button>
         </div>
     @empty
-        <p class="text-center py-3 mb-0">No products in cart</p>
+        <p class="text-center py-3 mb-0">No cart-products in cart</p>
     @endforelse
 </div>
 
@@ -82,7 +82,7 @@
 </div>
 
 <style>
-    .products {
+    .cart-products {
         max-height: 350px;
         overflow-y: auto;
         padding-right: 5px;
@@ -97,7 +97,7 @@
         padding-bottom: 10px;
     }
 
-    .product-media img {
+    .cart-product-media img {
         width: 70px;
         height: 70px;
         border-radius: 6px;
@@ -176,15 +176,18 @@
         font-weight: 600;
         font-size: 0.9rem;
     }
+    #quantity-form-group {
+        width: 50% !important;
+    }
 
-    /* 🔹 Mobile Responsive */
+    /* ðŸ”¹ Mobile Responsive */
     @media (max-width: 768px) {
         .cart-item-row {
             flex-direction: column;
             align-items: flex-start;
         }
 
-        .product-media img {
+        .cart-product-media img {
             width: 100%;
             height: auto;
             max-height: 150px;
@@ -206,6 +209,9 @@
 
         .cart-action a {
             width: 100%;
+        }
+        #quantity-form-group {
+            width: 100% !important;
         }
     }
 </style>
