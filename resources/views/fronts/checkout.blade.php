@@ -280,9 +280,19 @@
                                                 <tbody>
                                                 @foreach($carts as $cart)
                                                     <tr class="bb-no">
-                                                        <td class="product-name">{{$cart->product->product_name}} <i
-                                                                class="fas fa-times"></i> <span
-                                                                class="product-quantity">{{$cart->cart_qty}}</span></td>
+                                                        <td class="product-name">{{$cart->product->product_name}}
+                                                            <i class="fas fa-times"></i>
+                                                            <span class="product-quantity">{{$cart->cart_qty}}</span>
+                                                            @if(!empty($cart->variant_details))
+                                                                <br>
+                                                                @foreach($cart->variant_details as $variant)
+                                                                    <small class="text-muted">
+                                                                        {{ $variant->variant_name }}: {{ $variant->variant_value }}
+                                                                        @if(!$loop->last) | @endif
+                                                                    </small>
+                                                                @endforeach
+                                                            @endif
+                                                        </td>
                                                         <td class="product-total">{{$cart->unit_total}} BDT</td>
                                                     </tr>
                                                 @endforeach

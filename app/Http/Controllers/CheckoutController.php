@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Productvariant;
 use App\Models\Setting;
 use Exception;
 use Illuminate\Http\Request;
@@ -30,9 +31,14 @@ class CheckoutController extends Controller
     		$carts = Cart::with('product')->where('cart_session_id',Session::get('cart_session_id'))->get();
 	    	$sum = Cart::where('cart_session_id',Session::get('cart_session_id'))->sum('unit_total');
             $settings = Setting::first();
+
 	    	return view('fronts.checkout',compact('carts','sum', 'settings'));
-    	}else{
-    		return back();
+    	} else {
+            $notification=array(
+                'messege' => "Please login first.",
+                'alert-type' => "error",
+            );
+            return redirect()->route('home')->with($notification);
     	}
 
     }
@@ -83,6 +89,21 @@ class CheckoutController extends Controller
                     $product->update();
                 }
 
+                // ✅ যদি variant থাকে তাহলে প্রতিটি variant-এর stock_qty কমাও
+                if(!empty($cart?->productvariant_ids)) {
+                    // JSON হলে decode করো
+                    $variantIds = is_array($cart->productvariant_ids) ? $cart->productvariant_ids : json_decode($cart->productvariant_ids, true);
+
+                    foreach($variantIds as $variantId) {
+                        $productVariant = Productvariant::find($variantId);
+                        if($productVariant) {
+                            // stock কমাও
+                            $productVariant->stock_qty = max(0, $productVariant->stock_qty - $cart->cart_qty);
+                            $productVariant->save();
+                        }
+                    }
+                }
+
     			$order = new Order();
     			$order->orderdetail_id = $detail->id;
                 $order->variants = $cart->productvariant_ids;
@@ -109,7 +130,13 @@ class CheckoutController extends Controller
 
     	}catch(Exception $e){
     		DB::rollback();
-            return response()->json(['status'=>false, 'code'=>$e->getCode(), 'message'=>$e->getMessage()],500);
+            # return response()->json(['status'=>false, 'code'=>$e->getCode(), 'message'=>$e->getMessage()],500);
+
+            $notification=array(
+                'messege' => "Something went wrong!!!",
+                'alert-type' => "error",
+            );
+            return redirect('/')->with($notification);
         }
     }
     public function getCartHtml()

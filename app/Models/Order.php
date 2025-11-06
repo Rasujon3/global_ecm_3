@@ -10,6 +10,10 @@ class Order extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'variants' => 'array',
+    ];
+
     public function orderdetail()
     {
     	return $this->belongsTo(Orderdetail::class);
