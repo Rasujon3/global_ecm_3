@@ -27,7 +27,10 @@ class Product extends Model
         'tag',
     ];
 
-
+    public function getHasVariantsAttribute(): bool
+    {
+        return $this->productvariants()->exists();
+    }
     public function brand()
     {
     	return $this->belongsTo(Brand::class);

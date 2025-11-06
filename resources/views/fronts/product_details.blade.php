@@ -963,6 +963,7 @@
                         // $('#cart-dropdown-box').html(data.cart_html);
                         rebindCartEvents(); // rebind events for new content
                         triggerCartToggle();
+                        $('.product-variation-clean').trigger('click');
                     }
 
                     toastr.success(data.message);

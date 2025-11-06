@@ -26,6 +26,15 @@
             <div class="product-detail" id="product-detail-box">
                 <a href="{{ url('/product-details/'.$cart->product->id) }}" class="product-name">
                     {{ $cart->product->product_name }}
+                    @if(!empty($cart->variant_details))
+                        <br>
+                        @foreach($cart->variant_details as $variant)
+                            <small class="text-muted">
+                                {{ $variant->variant_name }}: {{ $variant->variant_value }}
+                                @if(!$loop->last) | @endif
+                            </small>
+                        @endforeach
+                    @endif
                 </a>
 
                 <div class="price-box">

@@ -198,80 +198,139 @@ class AjaxController extends Controller
 
     public function addToCart(Request $request)
     {
-        try
-        {
-            //return response()->json($request->all());
+        try {
             $product = Product::find($request->element_id);
-
             $variant = Productvariant::find($request->element_id);
-            $count = Cart::count();
-            $count+=1;
             $cart_session_id = Session::get('cart_session_id');
+            $count = Cart::count() + 1;
 
-            if(!stockCheck($request)){
-                return response()->json(['status'=>false, 'message'=>'The product is sold out']);
+            // 🧠 Stock check
+            if (!stockCheck($request)) {
+                return response()->json(['status' => false, 'message' => 'The product is sold out']);
             }
 
-            if($request->qty > $product->stock_qty) {
-                return response()->json(['status'=>false, 'message'=>'The requested quantity is not available in stock']);
+            if ($product && $request->qty > $product->stock_qty) {
+                return response()->json(['status' => false, 'message' => 'The requested quantity is not available in stock']);
             }
 
+            // 🧠 Create session ID if missing
             if (empty($cart_session_id)) {
                 $new_session_id = rand(1000, 9000) . $count;
                 Session::put('cart_session_id', $new_session_id);
                 $cart_session_id = $new_session_id;
             }
 
-            if($product){
-
+            // 🧮 Determine price
+            if ($product) {
                 $price = discount($product);
-
-            }else{
-                $price = $variant->variant_price == null?$product->product_price:$variant->variant_price;
+            } else {
+                $price = $variant->variant_price ?? $product->product_price;
             }
 
-            //return response()->json($product);
+            // 🧩 Handle variants - Sort and normalize
+            $variantIds = null;
+            $sortedVariantArray = null;
 
-            $cart = Cart::where('product_id',$product->id)->where('cart_session_id',$cart_session_id)->first();
+            if ($request->has('productvariant_ids') && !empty($request->productvariant_ids)) {
+                // Convert to array if it's a string
+                $variantArray = is_array($request->productvariant_ids)
+                    ? $request->productvariant_ids
+                    : json_decode($request->productvariant_ids, true);
 
+                // Sort the array to ensure consistent comparison
+                sort($variantArray);
+                $sortedVariantArray = $variantArray;
+                $variantIds = json_encode($sortedVariantArray);
+            }
 
-            if($cart){
-                $qty = $request->has('qty')?$request->qty+1:$cart->cart_qty+1;
-                $cart->cart_qty=$qty;
-                $cart->unit_total = round($price * $qty,2);
-                $cart->update();
-            }else{
-                $qty = $request->has('qty')?$request->qty:1;
+            // 🧠 Find existing cart with same product and variants
+            $cart = null;
+
+            if ($variantIds) {
+                // For products with variants - check all carts with this product
+                $existingCarts = Cart::where('product_id', $product->id)
+                    ->where('cart_session_id', $cart_session_id)
+                    ->whereNotNull('productvariant_ids')
+                    ->get();
+
+                // Compare decoded JSON arrays
+                foreach ($existingCarts as $existingCart) {
+                    $existingVariants = json_decode($existingCart->productvariant_ids, true);
+
+                    if ($existingVariants) {
+                        sort($existingVariants); // Sort for comparison
+
+                        // Compare sorted arrays
+                        if ($existingVariants == $sortedVariantArray) {
+                            $cart = $existingCart;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                // For products without variants - simple query
+                $cart = Cart::where('product_id', $product->id)
+                    ->where('cart_session_id', $cart_session_id)
+                    ->whereNull('productvariant_ids')
+                    ->first();
+            }
+
+            // 🛒 If exists — update qty
+            if ($cart) {
+                $newQty = $request->has('qty')
+                    ? $cart->cart_qty + $request->qty
+                    : $cart->cart_qty + 1;
+
+                // Check if new quantity exceeds stock
+                if ($product && $product->stock_qty && $newQty > $product->stock_qty) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Cannot add more. Only ' . $product->stock_qty . ' items available in stock'
+                    ]);
+                }
+
+                $cart->cart_qty = $newQty;
+                $cart->unit_total = round($price * $newQty, 2);
+                $cart->save();
+            }
+            // 🆕 Else — create new cart entry
+            else {
+                $qty = $request->has('qty') ? $request->qty : 1;
+
                 $cart = new Cart();
-                $cart->product_id = $request->use_for=='product'?$product->id:null;
+                $cart->product_id = $product->id;
                 $cart->cart_session_id = $cart_session_id;
-                $cart->productvariant_id = $request->use_for=='variant'?$variant->id:null;
-                $cart->productvariant_ids = $request->has('productvariant_ids')?json_encode($request->productvariant_ids):NULL;
-                $cart->cart_qty = $request->has('qty')?$request->qty:1;
-                $cart->unit_total = round($price * $qty,2);
+                $cart->productvariant_id = $request->use_for == 'variant' ? $variant->id : null;
+                $cart->productvariant_ids = $variantIds; // This is now properly formatted JSON
+                $cart->cart_qty = $qty;
+                $cart->unit_total = round($price * $qty, 2);
                 $cart->save();
             }
 
-            $countCart = Cart::where('cart_session_id',$cart_session_id)->count();
-            // Get rendered cart HTML + sum + count
-//            $cartData = $this->getCartHtml();
+            // 🧾 Count and HTML
+            $countCart = Cart::where('cart_session_id', $cart_session_id)->count();
             $cartData = $this->getCartHtml2();
 
             return response()->json([
                 'status' => true,
                 'cart_count' => $countCart,
-                'message' => 'Successfully the product has been added to cart',
+                'message' => $cart->wasRecentlyCreated
+                    ? 'Product added to cart successfully'
+                    : 'Cart quantity updated successfully',
                 'cart_html' => $cartData['html'],
                 'cart_sum' => $cartData['sum'],
             ]);
 
-            # return response()->json(['status'=>true, 'cart_count'=>$countCart, 'message'=>'Successfully the product has been added to cart']);
+        } catch (Exception $e) {
+            Log::error('Add to cart error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
 
-        }catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'code' => $e->getCode(),
-                'message' => $e->getMessage()
+                'message' => 'Failed to add product to cart: ' . $e->getMessage()
             ], 500);
         }
     }

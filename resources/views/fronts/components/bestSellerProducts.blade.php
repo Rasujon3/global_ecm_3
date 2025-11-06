@@ -41,9 +41,21 @@
 
                                         <!-- Action Buttons -->
                                         <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-cart add-to-cart" data-id="{{ $product->id }}" title="Add to cart">
-                                                <i class="w-icon-cart"></i>
-                                            </a>
+                                            @if (! $product->has_variants)
+                                                <a href="#"
+                                                   class="btn-product-icon btn-cart add-to-cart"
+                                                   data-id="{{ $product->id }}"
+                                                   title="Add to cart">
+                                                    <i class="w-icon-cart"></i>
+                                                </a>
+                                            @else
+                                                {{--  Detail page button (when variants exist)  --}}
+                                                <a href="{{url('/product-details/'.$product->id)}}"
+                                                   class="btn-product-icon btn-view"
+                                                   title="View Details">
+                                                    <i class="w-icon-info"></i>   {{-- or any icon you prefer --}}
+                                                </a>
+                                            @endif
                                             <a href="#" class="btn-product-icon btn-wishlist add-wishlist" data-id="{{ $product->id }}" title="Add to wishlist">
                                                 <i class="w-icon-heart"></i>
                                             </a>
