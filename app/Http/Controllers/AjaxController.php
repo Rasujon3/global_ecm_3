@@ -211,7 +211,7 @@ class AjaxController extends Controller
 
             // ✅ NEW: Stock check for variants or base product
             if ($variant) {
-                if ($variant->stock_qty && $request->qty > $variant->stock_qty) {
+                if ($variant->stock_qty == 0 || ($variant->stock_qty && $request->qty > $variant->stock_qty)) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Only ' . $variant->variant_stock_qty . ' items available in this variant'
