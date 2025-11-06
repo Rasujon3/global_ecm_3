@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Productvariant;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\Cart;
@@ -158,28 +159,51 @@ class CartController extends Controller
                 ]);
             }
 
-            // Check stock
-            $product = Product::find($cart->product_id);
-            if ($product && $product->stock_qty && $qty > $product->stock_qty) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Requested quantity exceeds available stock (' . $product->stock_qty . ' available)'
-                ]);
+            // 🧩 1️⃣ Variant stock check first
+            if (!empty($cart->productvariant_ids)) {
+                $variantIds = is_array($cart->productvariant_ids)
+                    ? $cart->productvariant_ids
+                    : json_decode($cart->productvariant_ids, true);
+
+                if (!empty($variantIds)) {
+                    // Find all selected variants
+                    $variants = Productvariant::whereIn('id', $variantIds)->get();
+
+                    // If any variant has limited stock
+                    foreach ($variants as $variant) {
+                        if ($variant->stock_qty !== null && $qty > $variant->stock_qty) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Requested quantity exceeds available variant stock (' . $variant->variant_qty . ' available)'
+                            ]);
+                        }
+                    }
+                }
+            }
+            // 🧱 2️⃣ Otherwise, check product-level stock
+            else {
+                $product = Product::find($cart->product_id);
+                if ($product && $product->stock_qty && $qty > $product->stock_qty) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Requested quantity exceeds available stock (' . $product->stock_qty . ' available)'
+                    ]);
+                }
             }
 
-            // Calculate price
+            // 💰 3️⃣ Determine price (variant or product)
             if ($cart->productvariant_id) {
                 $price = $cart->productvariant->variant_price;
             } else {
                 $price = discount($cart->product);
             }
 
-            // Update cart
+            // 🛒 4️⃣ Update cart
             $cart->cart_qty = $qty;
             $cart->unit_total = round($price * $qty, 2);
             $cart->save();
 
-            // Get updated cart data
+            // 🧾 5️⃣ Get updated cart data
             $countCart = Cart::where('cart_session_id', Session::get('cart_session_id'))->count();
             $cartData = $this->getCartHtml2();
 

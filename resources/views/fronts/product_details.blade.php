@@ -242,7 +242,7 @@
                                                 <div class="product-qty-form">
                                                     <div class="input-group">
                                                         <input class="quantity form-control" type="number" min="1"
-                                                            max="10000000">
+                                                            max="10000000" readonly>
                                                         <button class="quantity-plus w-icon-plus"></button>
                                                         <button class="quantity-minus w-icon-minus"></button>
                                                     </div>
@@ -809,7 +809,7 @@
                                                         <div class="product product-widget">
                                                             <figure class="product-media">
                                                                 <a href="#">
-                                                                    <img src="{{asset('front/assets')}}/images/shop/18.jpg" alt="Product"
+                                                                    <img src="" alt="Product"
                                                                         width="100" height="113" />
                                                                 </a>
                                                             </figure>

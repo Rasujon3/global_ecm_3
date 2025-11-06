@@ -209,8 +209,21 @@ class AjaxController extends Controller
                 return response()->json(['status' => false, 'message' => 'The product is sold out']);
             }
 
-            if ($product && $request->qty > $product->stock_qty) {
-                return response()->json(['status' => false, 'message' => 'The requested quantity is not available in stock']);
+            // ✅ NEW: Stock check for variants or base product
+            if ($variant) {
+                if ($variant->stock_qty && $request->qty > $variant->stock_qty) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Only ' . $variant->variant_stock_qty . ' items available in this variant'
+                    ]);
+                }
+            } else {
+                if ($product && $product->stock_qty && $request->qty > $product->stock_qty) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Only ' . $product->stock_qty . ' items available in stock'
+                    ]);
+                }
             }
 
             // 🧠 Create session ID if missing

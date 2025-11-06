@@ -70,7 +70,7 @@
                     @if($headerLogo)
                         <img src="{{ URL::to($headerLogo) }}"
                              alt="{{ $headerTitle }}"
-                             width="80" height="80"
+                             width="500" height="80"
                              class="me-3 rounded">
                     @endif
 
