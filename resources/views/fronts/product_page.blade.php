@@ -74,7 +74,7 @@
                              class="me-3 rounded">
                     @endif
 
-                    <h1 class="page-title mb-0 fw-bold">{{ $headerTitle }}</h1>
+{{--                    <h1 class="page-title mb-0 fw-bold">{{ $headerTitle }}</h1>--}}
                 </div>
             </div>
             <!-- End of Page Header -->

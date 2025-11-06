@@ -100,104 +100,102 @@
 
 @push('scripts')
 
-  <script>
-  	$(document).ready(function(){
-  		let order_id;
-  		var orderTable = $('#order-table-detail').DataTable({
-		        searching: true,
-		        processing: true,
-		        serverSide: true,
-		        ordering: false,
-		        responsive: true,
-		        stateSave: true,
-		        ajax: {
-		          url: "{{url('/order-lists')}}",
-                    data: function (d) {
-                        d.from_date = $('#from_date').val()
-                            d.to_date = $('#to_date').val()
-                            d.status = $('#selected_status').val()
-                        d.search = $('.dataTables_filter input').val()
+    <script>
+        $(document).ready(function() {
+            let order_id;
+
+            var orderTable = $('#order-table-detail').DataTable({
+                initComplete: function() {
+                    const searchInput = $('div.dataTables_filter input');
+                    searchInput.attr('id', 'datatable-search');
+                    searchInput.attr('name', 'datatable_search');
+                    searchInput.attr('placeholder', 'Search orders...');
+                },
+                searching: true,
+                processing: true,
+                serverSide: true,
+                ordering: false,
+                responsive: true,
+                stateSave: true,
+
+                ajax: {
+                    url: "{{ url('/order-lists') }}",
+                    data: function(d) {
+                        d.from_date = $('#from_date').val();
+                        d.to_date = $('#to_date').val();
+                        d.status = $('#selected_status').val();
+                        // DataTables automatically sends search.value
+                        // So this line below is optional
+                        d.search = $('#datatable-search').val();
                     }
-		        },
+                },
 
-		        columns: [
-		            {data: 'serial', name: 'serial'},
-	                {data: 'name', name: 'name'},
-	                {data: 'email', name: 'email'},
-	                {data: 'phone', name: 'phone'},
-	                {data: 'payment_method', name:'payment_method'},
-	                {data: 'date', name: 'date'},
-	                {data: 'time', name: 'time'},
-		            {data: 'status', name: 'status'},
-		            {data: 'action', name: 'action', orderable: false, searchable: false},
-		        ]
-        });
+                columns: [
+                    { data: 'serial', name: 'serial' },
+                    { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
+                    { data: 'phone', name: 'phone' },
+                    { data: 'payment_method', name: 'payment_method' },
+                    { data: 'date', name: 'date' },
+                    { data: 'time', name: 'time' },
+                    { data: 'status', name: 'status' },
+                    { data: 'action', name: 'action', orderable: false, searchable: false },
+                ]
+            });
 
-        $('.filter-order').click(function(e){
-            e.preventDefault();
-            orderTable.draw();
-        });
+            // 🔹 Filter button click
+            $('.filter-order').on('click', function(e) {
+                e.preventDefault();
+                orderTable.draw();
+            });
 
-       $(document).on('click', '#status-order-update', function(){
+            // 🔹 Delete Order
+            $(document).on('click', '.delete-order', function(e) {
+                e.preventDefault();
+                order_id = $(this).data('id');
 
-	         order_id = $(this).data('id');
-
-       });
-
-
-       $(document).on('click', '.delete-order', function(e){
-
-           e.preventDefault();
-
-           order_id = $(this).data('id');
-
-           if(confirm('Do you want to delete this?'))
-           {
-               $.ajax({
-
-                    url: "{{url('/delete-order')}}/"+order_id,
-
-                         type:"GET",
-                         dataType:"json",
-                         success:function(data) {
-
+                if (confirm('Do you want to delete this?')) {
+                    $.ajax({
+                        url: "{{ url('/delete-order') }}/" + order_id,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
                             toastr.success(data.message);
+                            orderTable.ajax.reload(null, false);
+                        },
+                        error: function() {
+                            toastr.error('Something went wrong.');
+                        }
+                    });
+                }
+            });
 
-                            $('.data-table').DataTable().ajax.reload(null, false);
+            // 🔹 Change Order Status
+            $(document).on('change', '.change-status', function() {
+                order_id = $(this).data('id');
+                var status_val = $(this).val();
 
-                    },
-
-              });
-           }
-
-       });
-
-        $(document).on('change', '.change-status', function(){
-
-            order_id = $(this).data('id');
-            var status_val = $(this).val();
-
-            if(confirm('Do you want to change the status?'))
-            {
-                $.ajax({
-
-                    url: "{{url('/order-status-update')}}",
-
-                    type:"POST",
-                    data:{'order_id':order_id, 'status':status_val},
-                    dataType:"json",
-                    success:function(data) {
-                        toastr.success(data.message);
-
-                        $('.data-table').DataTable().ajax.reload(null, false);
-
-                    },
-
-                });
-            }
+                if (confirm('Do you want to change the status?')) {
+                    $.ajax({
+                        url: "{{ url('/order-status-update') }}",
+                        type: "POST",
+                        data: {
+                            order_id: order_id,
+                            status: status_val,
+                            _token: "{{ csrf_token() }}" // ✅ Add CSRF token for security
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            toastr.success(data.message);
+                            orderTable.ajax.reload(null, false);
+                        },
+                        error: function() {
+                            toastr.error('Status update failed.');
+                        }
+                    });
+                }
+            });
         });
-
-  	});
-  </script>
+    </script>
 
 @endpush

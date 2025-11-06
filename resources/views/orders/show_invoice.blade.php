@@ -82,15 +82,16 @@
                       <th>Serial #</th>
                       <th>Product</th>
                       <th>Qty</th>
+                      <th>Per Unit Price</th>
                       <th>Unit Total</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($data->orders as $key=>$order)
                     <tr>
-                        <td>{{$key+1}}</td>
+                        <td>{{ $key+1 }}</td>
                         <td>
-                            {{$order->product->product_name}}
+                            {{ $order->product->product_name }}
                             {{-- ✅ Show variants if available --}}
                             @if(!empty($order->variant_details))
                                 <br>
@@ -102,8 +103,9 @@
                                 @endforeach
                             @endif
                         </td>
-                        <td>{{$order->qty}}</td>
-                        <td>{{discount($order->product)}} BDT</td>
+                        <td>{{ $order->qty }}</td>
+                        <td>{{ discount($order->product) }} BDT</td>
+                        <td>{{ discount($order->product) * $order->qty }} BDT</td>
                     </tr>
                     @endforeach
                     </tbody>

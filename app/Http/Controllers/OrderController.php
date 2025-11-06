@@ -32,7 +32,7 @@ class OrderController extends Controller
                 })
 
                 ->addColumn('payment_method', function ($row) {
-                	return $row->paymentmethod->name;
+                    return optional($row->paymentmethod)->name ?? 'N/A';
                 })
 
 //                ->addColumn('status', function ($row) {
@@ -99,9 +99,16 @@ class OrderController extends Controller
                         });
                     }
 
-
-                })->setRowID('id')
-
+                    if ($request->has('search') && isset($request->search) && $request->search !== '') {
+                        $searchValue = $request->search;
+                        $instance->where(function ($q) use ($searchValue) {
+                            $q->where('orderdetails.name', 'like', "%{$searchValue}%")
+                                ->orWhere('orderdetails.id', 'like', "%{$searchValue}%")
+                                ->orWhere('orderdetails.phone', 'like', "%{$searchValue}%")
+                                ->orWhere('orderdetails.email', 'like', "%{$searchValue}%");
+                        });
+                    }
+                })
                 ->rawColumns(['status', 'action','serial','payment_method'])
                 ->make(true);
         }

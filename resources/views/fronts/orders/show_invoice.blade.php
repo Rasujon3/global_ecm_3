@@ -55,6 +55,7 @@
                   <th>Serial #</th>
                   <th>Product</th>
                   <th>Qty</th>
+                  <th>Per Unit Price</th>
                   <th>Unit Total</th>
                 </tr>
                 </thead>
@@ -77,6 +78,7 @@
                     </td>
                     <td>{{$order->qty}}</td>
                     <td>{{discount($order->product)}} BDT</td>
+                    <td>{{ discount($order->product) * $order->qty }} BDT</td>
                 </tr>
                 @endforeach
                 </tbody>
