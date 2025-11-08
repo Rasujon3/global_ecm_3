@@ -285,7 +285,7 @@
                                             <div class="product-form container">
                                                 <div class="product-qty-form">
                                                     <div class="input-group">
-                                                        <input class="quantity form-control" type="number" min="1" max="10000000" value="1" readonly>
+                                                        <input class="quantity form-control" type="number" min="1" max="10000000" readonly>
                                                         <button class="quantity-plus w-icon-plus"></button>
                                                         <button class="quantity-minus w-icon-minus"></button>
                                                     </div>
@@ -1118,21 +1118,21 @@
             // ========================================
             // QUANTITY BUTTONS
             // ========================================
-            $(document).on('click', '.quantity-plus', function(e) {
-                e.preventDefault();
-                let $input = $('.quantity');
-                let currentVal = parseInt($input.val()) || 1;
-                $input.val(currentVal + 1);
-            });
-
-            $(document).on('click', '.quantity-minus', function(e) {
-                e.preventDefault();
-                let $input = $('.quantity');
-                let currentVal = parseInt($input.val()) || 1;
-                if (currentVal > 1) {
-                    $input.val(currentVal - 1);
-                }
-            });
+            // $(document).on('click', '.quantity-plus', function(e) {
+            //     e.preventDefault();
+            //     let $input = $('.quantity');
+            //     let currentVal = parseInt($input.val()) || 1;
+            //     $input.val(currentVal + 1);
+            // });
+            //
+            // $(document).on('click', '.quantity-minus', function(e) {
+            //     e.preventDefault();
+            //     let $input = $('.quantity');
+            //     let currentVal = parseInt($input.val()) || 1;
+            //     if (currentVal > 1) {
+            //         $input.val(currentVal - 1);
+            //     }
+            // });
         });
 
         // ========================================
