@@ -24,6 +24,50 @@
         .label-out {
             background-color: #dc3545;
         }
+        /* ✅ Variant selection active state */
+        .select-variant.active {
+            border: 2px solid #ff6b6b !important;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .product-variation-form .color.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ff6b6b;
+        }
+
+        .product-variation-form .size.active {
+            background: #ff6b6b !important;
+            color: #fff !important;
+            border-color: #ff6b6b !important;
+        }
+
+        /* ✅ Shake animation for validation error */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake-animation {
+            animation: shake 0.5s;
+            border: 2px solid #ff4444;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 68, 68, 0.05);
+        }
+
+        /* ✅ Variant price display */
+        .product-variant-price {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .product-variant-price span {
+            color: #ff6b6b;
+            font-size: 16px;
+        }
     </style>
  <!-- Start of Main -->
         <main class="main mb-10 pb-1">
@@ -241,8 +285,7 @@
                                             <div class="product-form container">
                                                 <div class="product-qty-form">
                                                     <div class="input-group">
-                                                        <input class="quantity form-control" type="number" min="1"
-                                                            max="10000000" readonly>
+                                                        <input class="quantity form-control" type="number" min="1" max="10000000" value="1" readonly>
                                                         <button class="quantity-plus w-icon-plus"></button>
                                                         <button class="quantity-minus w-icon-minus"></button>
                                                     </div>
@@ -846,162 +889,282 @@
 @endsection
 
 @push('scripts')
- <script>
- 	let variant_id;
- 	let productvariant_ids = [];
- 	let base_url = "{{url('/')}}";
+    <script>
+        let variant_id;
+        let productvariant_ids = [];
+        let base_url = "{{url('/')}}";
+        const hasVariants = {{ count($variants) > 0 ? 'true' : 'false' }}; // Check if product has variants
 
-   $(document).ready(function(){
-   	 $(document).on('click', '.select-variant', function(e){
-   	 	e.preventDefault();
-   	 	variant_id = $(this).data('id');
-   	 	$.ajax({
+        $(document).ready(function(){
 
-            url: "{{url('/product-variant-details')}}/"+variant_id,
+            // ========================================
+            // SELECT VARIANT
+            // ========================================
+            $(document).on('click', '.select-variant', function(e){
+                e.preventDefault();
 
-                type:"GET",
-                dataType:"json",
-                success:function(data) {
-                	if(data.status == true){
-                        var newImage = base_url + '/' + data.variant.image;
-                        var $productImage = $('.product-single-swiper .swiper-slide:first-child .product-image img');
-                        $productImage.attr('src', newImage);
-                        $productImage.attr('data-zoom-image', newImage);
+                const $clickedVariant = $(this);
+                const clickedVariantId = $clickedVariant.data('id');
+                const $variantGroup = $clickedVariant.closest('.product-variation-form');
 
-                        // Update swiper
-                        if (Wolmart.slider) {
-                            var $slider = $('.product-single-swiper');
-                            if ($slider.data('slider')) {
-                                $slider.data('slider').update();
+                // Get all variants in the SAME group (color group or size group)
+                const $siblingsInGroup = $variantGroup.find('.select-variant');
+
+                // Get all variant IDs in this group
+                const variantIdsInThisGroup = [];
+                $siblingsInGroup.each(function() {
+                    variantIdsInThisGroup.push($(this).data('id'));
+                });
+
+                // Remove ALL variants from this group from the array
+                productvariant_ids = productvariant_ids.filter(id => !variantIdsInThisGroup.includes(id));
+
+                // Remove active class from siblings in same group
+                $siblingsInGroup.removeClass('active');
+
+                // Add active class to clicked variant
+                $clickedVariant.addClass('active');
+
+                // Add ONLY the clicked variant ID to array
+                productvariant_ids.push(clickedVariantId);
+                variant_id = clickedVariantId;
+
+                console.log('Selected variants:', productvariant_ids);
+
+                // Fetch variant details
+                $.ajax({
+                    url: "{{url('/product-variant-details')}}/"+clickedVariantId,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        if(data.status == true){
+                            // Update main product image
+                            var newImage = base_url + '/' + data.variant.image;
+                            var $productImage = $('.product-single-swiper .swiper-slide:first-child .product-image img');
+                            $productImage.attr('src', newImage);
+                            $productImage.attr('data-zoom-image', newImage);
+
+                            // Update swiper if exists
+                            if (typeof Wolmart !== 'undefined' && Wolmart.slider) {
+                                var $slider = $('.product-single-swiper');
+                                if ($slider.data('slider')) {
+                                    $slider.data('slider').update();
+                                }
+                            }
+
+                            // Show variant price if exists
+                            if(data.variant.variant_price) {
+                                $('.product-variant-price span').html(
+                                    '<strong>Variant Price:</strong> ' + data.variant.variant_price + ' BDT'
+                                );
                             }
                         }
-                	}
 
-                    productvariant_ids.push(variant_id);
+                        console.log('Variant details loaded:', data);
+                    },
+                    error: function(xhr) {
+                        console.error('Variant fetch error:', xhr);
+                        toastr.error('Failed to load variant details');
+                    }
+                });
+            });
 
-            },
+            // ========================================
+            // CLEAN VARIANTS
+            // ========================================
+            $(document).on('click', '.product-variation-clean', function(e){
+                e.preventDefault();
+                cleanVariants();
+            });
 
-	    });
+            function cleanVariants() {
+                // Clear variant IDs array
+                productvariant_ids = [];
+                variant_id = null;
 
-   	 });
+                // Remove active class from all variants
+                $('.select-variant').removeClass('active');
 
-   	 $(document).on('click', '.product-variation-clean', function(e){
-   	 	e.preventDefault();
-   	 	productvariant_ids = [];
-   	 });
+                // Clear variant price display
+                $('.product-variant-price span').html('');
 
-       function rebindCartEvents() {
-           $(document).on('click', '.btn-close', function(e) {
-               e.preventDefault();
-               const target = $(this).data('target');
+                // Reset to original product image (first image)
+                @if($product->images && count($product->images) > 0)
+                var originalImage = "{{ URL::to($product->images[0]->image) }}";
+                var $productImage = $('.product-single-swiper .swiper-slide:first-child .product-image img');
+                $productImage.attr('src', originalImage);
+                $productImage.attr('data-zoom-image', originalImage);
+                @endif
 
-               switch (target) {
-                   case 'cart':
-                       $('.cart-dropdown').removeClass('show');
-                       $('.cart-overlay').removeClass('show');
-                       break;
-               }
-           });
-       }
+                console.log('Variants cleaned');
+            }
 
-       function triggerCartToggle(loadContent = true) {
-           try {
-               const cartToggle = document.querySelector('.cart-toggle');
+            // ========================================
+            // REBIND CART EVENTS
+            // ========================================
+            function rebindCartEvents() {
+                $(document).on('click', '.btn-close', function(e) {
+                    e.preventDefault();
+                    const target = $(this).data('target');
 
-               if (!cartToggle) {
-                   console.warn('Cart toggle element not found');
-                   return false;
-               }
+                    switch (target) {
+                        case 'cart':
+                            $('.cart-dropdown').removeClass('show');
+                            $('.cart-overlay').removeClass('show');
+                            break;
+                    }
+                });
+            }
 
-               // Create and dispatch a real click event
-               const clickEvent = new MouseEvent('click', {
-                   view: window,
-                   bubbles: true,
-                   cancelable: true
-               });
+            // ========================================
+            // TRIGGER CART TOGGLE
+            // ========================================
+            function triggerCartToggle(loadContent = true) {
+                try {
+                    const cartToggle = document.querySelector('.cart-toggle');
 
-               cartToggle.dispatchEvent(clickEvent);
-
-               // Optionally load cart content
-               if (loadContent && typeof window.loadCartContent === 'function') {
-                   window.loadCartContent();
-               }
-
-               return true;
-           } catch (error) {
-               console.error('Error triggering cart toggle:', error);
-               return false;
-           }
-       }
-
-   	 $(document).on('click', '.add-cart', function(e){
-   	 	e.preventDefault();
-   	 	let product_id = $(this).data('id');
-   	 	//alert(product_id);
-   	 	let use_for = "product";
-   	 	let qty = $('.quantity').val();
-   	 	let redirectUrl = base_url+"/carts";
-   	 	$.ajax({
-
-            url: "{{url('/add-to-cart')}}",
-
-                type:"GET",
-                data:{'element_id':product_id,'productvariant_ids':productvariant_ids,'use_for':use_for,'qty':qty},
-                dataType:"json",
-                success:function(data) {
-                if (data.status == false) {
-                    toastr.error(data.message);
-                } else {
-
-                    // update cart count in header
-                    $('.cart-count').text(data.cart_count);
-
-                    // replace dropdown-box content
-                    if (data.cart_html) {
-                        $('#cart-dropdown-box').html($(data.cart_html).find('#cart-dropdown-box').html());
-                        // if you want to ensure the new HTML has id #cart-dropdown-box:
-                        // $('#cart-dropdown-box').html(data.cart_html);
-                        rebindCartEvents(); // rebind events for new content
-                        triggerCartToggle();
-                        $('.product-variation-clean').trigger('click');
+                    if (!cartToggle) {
+                        console.warn('Cart toggle element not found');
+                        return false;
                     }
 
-                    toastr.success(data.message);
-                    // setTimeout(function() {
-                    //     window.location.href = redirectUrl;
-                    // }, 1000);
+                    // Dispatch click event
+                    const clickEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true
+                    });
+
+                    cartToggle.dispatchEvent(clickEvent);
+
+                    // Load cart content if function exists
+                    if (loadContent && typeof window.loadCartContent === 'function') {
+                        window.loadCartContent();
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error('Error triggering cart toggle:', error);
+                    return false;
+                }
+            }
+
+            // ========================================
+            // ADD TO CART WITH VARIANT VALIDATION
+            // ========================================
+            $(document).on('click', '.add-cart', function(e){
+                e.preventDefault();
+
+                let product_id = $(this).data('id');
+                let use_for = "product";
+                let qty = $('.quantity').val();
+
+                // ✅ VALIDATE: Check if product has variants but none selected
+                if (hasVariants && productvariant_ids.length === 0) {
+                    toastr.error('Please select product variants before adding to cart');
+
+                    // Highlight variant section with shake animation
+                    $('.product-variation-form').addClass('shake-animation');
+                    setTimeout(function() {
+                        $('.product-variation-form').removeClass('shake-animation');
+                    }, 500);
+
+                    return false;
                 }
 
-            },
+                // Disable button to prevent double clicks
+                const $button = $(this);
+                $button.prop('disabled', true).html('<i class="w-icon-spinner"></i> Adding...');
 
-	    });
+                $.ajax({
+                    url: "{{url('/add-to-cart')}}",
+                    type: "GET",
+                    data: {
+                        'element_id': product_id,
+                        'productvariant_ids': productvariant_ids,
+                        'use_for': use_for,
+                        'qty': qty
+                    },
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.status == false) {
+                            toastr.error(data.message);
+                        } else {
+                            // Update cart count in header
+                            $('.cart-count').text(data.cart_count);
 
-   	 });
-      	 });
+                            // Replace dropdown-box content
+                            if (data.cart_html) {
+                                $('#cart-dropdown-box').html($(data.cart_html).find('#cart-dropdown-box').html());
+                                rebindCartEvents();
+                            }
+
+                            toastr.success(data.message);
+
+                            // ✅ Clean variants after successful add to cart
+                            if (hasVariants) {
+                                cleanVariants();
+                            }
+
+                            // ✅ Trigger cart toggle to show cart
+                            triggerCartToggle();
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Add to cart error:', xhr);
+                        toastr.error('Failed to add product to cart');
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        $button.prop('disabled', false).html('<i class="w-icon-cart"></i><span>Add to Cart</span>');
+                    }
+                });
+            });
+
+            // ========================================
+            // QUANTITY BUTTONS
+            // ========================================
+            $(document).on('click', '.quantity-plus', function(e) {
+                e.preventDefault();
+                let $input = $('.quantity');
+                let currentVal = parseInt($input.val()) || 1;
+                $input.val(currentVal + 1);
+            });
+
+            $(document).on('click', '.quantity-minus', function(e) {
+                e.preventDefault();
+                let $input = $('.quantity');
+                let currentVal = parseInt($input.val()) || 1;
+                if (currentVal > 1) {
+                    $input.val(currentVal - 1);
+                }
+            });
+        });
+
+        // ========================================
+        // STAR RATING SCRIPT
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            var stars = document.querySelectorAll('.rating-stars a');
+            var ratingInput = document.getElementById('rating-value');
+
+            if (stars.length && ratingInput) {
+                stars.forEach(function(star, index) {
+                    star.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        ratingInput.value = index + 1;
+
+                        // Visual feedback
+                        stars.forEach(function(s, i) {
+                            if (i <= index) {
+                                s.classList.add('active');
+                            } else {
+                                s.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+        });
     </script>
-   <script>
-       // Simple star rating script
-       document.addEventListener('DOMContentLoaded', function() {
-           var stars = document.querySelectorAll('.rating-stars a');
-           var ratingInput = document.getElementById('rating-value');
-
-           if (stars.length && ratingInput) {
-               stars.forEach(function(star, index) {
-                   star.addEventListener('click', function(e) {
-                       e.preventDefault();
-                       ratingInput.value = index + 1;
-
-                       // Visual feedback
-                       stars.forEach(function(s, i) {
-                           if (i <= index) {
-                               s.classList.add('active');
-                           } else {
-                               s.classList.remove('active');
-                           }
-                       });
-                   });
-               });
-           }
-       });
-   </script>
-   @endpush
+@endpush
