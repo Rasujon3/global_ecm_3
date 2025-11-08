@@ -71,7 +71,9 @@
                         <img src="{{ URL::to($headerLogo) }}"
                              alt="{{ $headerTitle }}"
                              width="500" height="80"
-                             class="me-3 rounded">
+                             class="me-3 rounded"
+                             style="max-height: 150px !important;"
+                        >
                     @endif
 
 {{--                    <h1 class="page-title mb-0 fw-bold">{{ $headerTitle }}</h1>--}}
