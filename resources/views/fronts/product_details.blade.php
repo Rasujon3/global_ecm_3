@@ -929,8 +929,6 @@
                 productvariant_ids.push(clickedVariantId);
                 variant_id = clickedVariantId;
 
-                console.log('Selected variants:', productvariant_ids);
-
                 // Fetch variant details
                 $.ajax({
                     url: "{{url('/product-variant-details')}}/"+clickedVariantId,
@@ -959,8 +957,6 @@
                                 );
                             }
                         }
-
-                        console.log('Variant details loaded:', data);
                     },
                     error: function(xhr) {
                         console.error('Variant fetch error:', xhr);
@@ -995,8 +991,6 @@
                 $productImage.attr('src', originalImage);
                 $productImage.attr('data-zoom-image', originalImage);
                 @endif
-
-                console.log('Variants cleaned');
             }
 
             // ========================================

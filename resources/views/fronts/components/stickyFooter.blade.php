@@ -4,11 +4,11 @@
         <i class="w-icon-home"></i>
         <p>Home</p>
     </a>
-    <a href="shop-banner-sidebar.html" class="sticky-link">
+    <a href="#" class="sticky-link">
         <i class="w-icon-category"></i>
         <p>Shop</p>
     </a>
-    <a href="my-account.html" class="sticky-link">
+    <a href="#" class="sticky-link">
         <i class="w-icon-account"></i>
         <p>Account</p>
     </a>
@@ -22,7 +22,7 @@
                 <div class="product product-cart">
                     <div class="product-detail">
                         <h3 class="product-name">
-                            <a href="product-default.html">Beige knitted elas<br>tic
+                            <a href="#">Beige knitted elas<br>tic
                                 runner shoes</a>
                         </h3>
                         <div class="price-box">
@@ -31,8 +31,8 @@
                         </div>
                     </div>
                     <figure class="product-media">
-                        <a href="product-default.html">
-                            <img src="front/assets/images/cart/product-1.jpg" alt="product" height="84" width="94" />
+                        <a href="#">
+                            <img src="{{ asset('front/assets/images/cart/product-1.jpg') }}" alt="product" height="84" width="94" />
                         </a>
                     </figure>
                     <button class="btn btn-link btn-close" aria-label="button">
@@ -43,7 +43,7 @@
                 <div class="product product-cart">
                     <div class="product-detail">
                         <h3 class="product-name">
-                            <a href="product-default.html">Blue utility pina<br>fore
+                            <a href="#">Blue utility pina<br>fore
                                 denim dress</a>
                         </h3>
                         <div class="price-box">
@@ -52,8 +52,8 @@
                         </div>
                     </div>
                     <figure class="product-media">
-                        <a href="product-default.html">
-                            <img src="front/assets/images/cart/product-2.jpg" alt="product" width="84" height="94" />
+                        <a href="#">
+                            <img src="{{ asset('front/assets/images/cart/product-2.jpg') }}" alt="product" width="84" height="94" />
                         </a>
                     </figure>
                     <button class="btn btn-link btn-close" aria-label="button">
@@ -68,8 +68,8 @@
             </div>
 
             <div class="cart-action">
-                <a href="{{url('/carts')}}" class="btn btn-dark btn-outline btn-rounded">View Cart</a>
-                <a href="checkout.html" class="btn btn-primary  btn-rounded">Checkout</a>
+                <a href="{{ url('/carts') }}" class="btn btn-dark btn-outline btn-rounded">View Cart</a>
+                <a href="{{ url('/checkout') }}" class="btn btn-primary  btn-rounded">Checkout</a>
             </div>
         </div>
         <!-- End of Dropdown Box -->

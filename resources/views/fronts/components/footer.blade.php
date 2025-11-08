@@ -152,7 +152,7 @@
             <div class="footer-right d-none">
                 <span class="payment-label mr-lg-8">We're using safe payment for</span>
                 <figure class="payment">
-                    <img src="front/assets/images/payment.png" alt="payment" width="159" height="25" />
+                    <img src="{{ asset('front/assets/images/payment.png') }}" alt="payment" width="159" height="25" />
                 </figure>
             </div>
         </div>
