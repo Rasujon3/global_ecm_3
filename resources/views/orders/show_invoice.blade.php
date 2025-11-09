@@ -39,11 +39,11 @@
               <div class="row">
                 <div class="col-12">
                   <h4>
-                    <i class="fas fa-globe"></i> {{ setting()->shop_name }}
-                    <b class="float-right">Order: INV-00-{{$data->id}}</b><br/>
-                    <small class="float-right">Date: {{$data->date}}</small><br/>
-                    <small class="float-right">Status: {{$data->status}}</small><br/>
-                    <small class="float-right">Payment Method: {{ $data->paymentmethod->name }}</small>
+                    <i class="fas fa-globe"></i> {{ setting()->shop_name ?? 'Glamours World' }}
+                    <b class="float-right">Order: INV-00-{{$data->id ?? '001'}}</b><br/>
+                    <small class="float-right">Date: {{$data->date ?? 'N/A' }}</small><br/>
+                    <small class="float-right">Status: {{$data->status ?? 'N/A'}}</small><br/>
+                    <small class="float-right">Payment Method: {{ $data->paymentmethod->name ?? 'N/A' }}</small>
                       @if($data->screen_shot)
                             <br/>
                             <a href="{{asset($data->screen_shot)}}" target="_blank" class="float-right btn btn-sm btn-info">View Screenshot</a>
@@ -62,10 +62,10 @@
                 <div class="col-sm-4 invoice-col">
                   {{-- From --}}
                   <address>
-                    <strong>{{$data->name}}</strong><br>
-                   {{$data->full_address}}<br/>
-                    Email: {{$data->email}}<br/>
-                    Phone: {{$data->phone}}
+                    <strong>{{$data->name ?? 'N/A'}}</strong><br>
+                   {{$data->full_address ?? 'N/A'}}<br/>
+                    Email: {{$data->email ?? 'N/A'}}<br/>
+                    Phone: {{$data->phone ?? 'N/A'}}
                   </address>
                 </div>
 
@@ -91,7 +91,7 @@
                     <tr>
                         <td>{{ $key+1 }}</td>
                         <td>
-                            {{ $order->product->product_name }}
+                            {{ $order?->product?->product_name ?? 'N/A' }}
                             {{-- ✅ Show variants if available --}}
                             @if(!empty($order->variant_details))
                                 <br>
@@ -103,9 +103,9 @@
                                 @endforeach
                             @endif
                         </td>
-                        <td>{{ $order->qty }}</td>
-                        <td>{{ discount($order->product) }} BDT</td>
-                        <td>{{ discount($order->product) * $order->qty }} BDT</td>
+                        <td>{{ $order->qty ?? 'N/A' }}</td>
+                        <td>{{ $order->product ?  discount($order->product) : 'N/A' }} BDT</td>
+                        <td>{{ $order->product ? discount($order->product) * $order->qty : 'N/A' }} BDT</td>
                     </tr>
                     @endforeach
                     </tbody>
@@ -123,11 +123,11 @@
                     <table class="table">
                       <tr>
                         <th style="width:50%">Subtotal:</th>
-                        <td>{{$data->sub_total}} BDT</td>
+                        <td>{{$data->sub_total ?? 'N/A' }} BDT</td>
                       </tr>
                       <tr>
                           <th style="width:50%">Delivery Charge:</th>
-                          <td>{{$data->delivery_charge}} BDT</td>
+                          <td>{{$data->delivery_charge ?? 'N/A' }} BDT</td>
                       </tr>
                       <tr class="d-none">
                         <th>Tax (9.3%)</th>
@@ -139,7 +139,7 @@
                       </tr>
                       <tr>
                         <th>Total:</th>
-                        <td>{{$data->total}} BDT</td>
+                        <td>{{$data->total ?? 'N/A' }} BDT</td>
                       </tr>
                     </table>
                   </div>
