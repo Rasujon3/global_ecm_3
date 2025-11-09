@@ -36,52 +36,58 @@
                             </tr>
                         </thead>
                         <tbody>
-                          @foreach($data as $row)
-                            <tr id="wishlist_{{$row->id}}">
-                                <td class="product-thumbnail">
-                                    <div class="p-relative">
-                                        <a href="{{url('/product-details/'.$row->id)}}">
-                                            <figure>
-                                                <img
-                                                    src="{{URL::to($row->product?->images?->first()?->image ?? '')}}"
-                                                    alt="product"
-                                                    width="300"
-                                                    height="338"
-                                                >
-                                            </figure>
-                                        </a>
-                                        <button type="button" class="btn btn-close remove-wishlist" data-id="{{$row->id}}"><i
-                                                class="fas fa-times"></i></button>
-                                    </div>
-                                </td>
-                                <td class="product-name">
-                                    <a href="{{url('/product-details/'.$row->id)}}">
-                                        {{$row->product->product_name}}
-                                    </a>
-                                </td>
-                                <td class="product-price">
-                                  @if($row->product->discount > 0)
-                                    <ins class="new-price">{{discount($row->product)}} BDT</ins><del
-                                        class="old-price">{{$row->product->product_price}}BDT</del>
-                                  @else
-                                    <ins class="new-price">{{$row->product->product_price}} BDT</ins>
-                                  @endif
-                                </td>
-                                <td class="product-stock-status">
-                                	@if($row->product->stock_qty > 0)
-                                    <span class="wishlist-in-stock">In Stock</span>
-                                    @else
-                                      <span class="wishlist-in-stock">Sold Out</span>
-                                    @endif
-                                </td>
-                                <td class="wishlist-action">
-                                    <div class="d-lg-flex">
-                                        <a href="{{url('/product-details/'.$row->product->id)}}"
-                                            class="btn  btn-outline btn-default btn-rounded btn-sm mb-2 mb-lg-0">View Product</a>
-                                    </div>
-                                </td>
-                            </tr>
-                           @endforeach
+                            @if($data->isEmpty())
+                                <tr>
+                                    <td colspan="5" class="text-center">No wishlist found!</td>
+                                </tr>
+                                @else
+                                @foreach($data as $row)
+                                    <tr id="wishlist_{{$row->id}}">
+                                        <td class="product-thumbnail">
+                                            <div class="p-relative">
+                                                <a href="{{ $row->id ? url('/product-details/'.$row->id) : '#' }}">
+                                                    <figure>
+                                                        <img
+                                                            src="{{URL::to($row->product?->images?->first()?->image ?? '')}}"
+                                                            alt="product"
+                                                            width="300"
+                                                            height="338"
+                                                        >
+                                                    </figure>
+                                                </a>
+                                                <button type="button" class="btn btn-close remove-wishlist" data-id="{{$row->id}}"><i
+                                                        class="fas fa-times"></i></button>
+                                            </div>
+                                        </td>
+                                        <td class="product-name">
+                                            <a href="{{ url('/product-details/'.$row->id) }}">
+                                                {{ $row?->product?->product_name ?? 'N/A' }}
+                                            </a>
+                                        </td>
+                                        <td class="product-price">
+                                            @if($row?->product?->discount > 0)
+                                                <ins class="new-price">{{ $row->product ? discount($row->product) : 'N/A' }} BDT</ins><del
+                                                    class="old-price">{{ $row?->product?->product_price ?? 'N/A' }} BDT</del>
+                                            @else
+                                                <ins class="new-price">{{ $row?->product?->product_price ?? 'N/A' }} BDT</ins>
+                                            @endif
+                                        </td>
+                                        <td class="product-stock-status">
+                                            @if($row?->product?->stock_qty > 0)
+                                                <span class="wishlist-in-stock">In Stock</span>
+                                            @else
+                                                <span class="wishlist-in-stock">Sold Out</span>
+                                            @endif
+                                        </td>
+                                        <td class="wishlist-action">
+                                            <div class="d-lg-flex">
+                                                <a href="{{ $row?->product?->id ? url('/product-details/'.$row?->product?->id) : '#' }}"
+                                                   class="btn  btn-outline btn-default btn-rounded btn-sm mb-2 mb-lg-0">View Product</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
                         </tbody>
                     </table>
                     <div style="margin-top: 5px; margin-bottom: 5px;">
