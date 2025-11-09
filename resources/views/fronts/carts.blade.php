@@ -76,8 +76,8 @@
                                                 value="{{$cart->cart_qty}}"
                                                 />
 
-                                                <button class="quantity-inc w-icon-plus" data-id="{{$cart->id}}"></button>
-                                                <button class="quantity-dc w-icon-minus" data-id="{{$cart->id}}"></button>
+                                                <button class="quantity-increase w-icon-plus" data-id="{{$cart->id}}"></button>
+                                                <button class="quantity-decrease w-icon-minus" data-id="{{$cart->id}}"></button>
                                             </div>
                                         </td>
                                         <td class="product-subtotal">
@@ -232,7 +232,7 @@
            });
        }
 
-      $(document).on('click', '.quantity-inc', function(e){
+      $(document).on('click', '.quantity-increase', function(e){
         e.preventDefault();
         cart_id = $(this).data('id');
         let qty = parseFloat($('#cart_input_'+cart_id).val());
@@ -265,7 +265,7 @@
           }
       });
 
-      $(document).on('click', '.quantity-dc', function(e){
+      $(document).on('click', '.quantity-decrease', function(e){
         e.preventDefault();
         cart_id = $(this).data('id');
         let qty = parseFloat($('#cart_input_'+cart_id).val());
