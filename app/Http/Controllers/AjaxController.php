@@ -209,20 +209,89 @@ class AjaxController extends Controller
                 return response()->json(['status' => false, 'message' => 'The product is sold out']);
             }
 
+            $productVariantIDs = $request->productvariant_ids ?? [];
             // ✅ NEW: Stock check for variants or base product
-            if ($variant) {
-                if ($variant->stock_qty == 0 || ($variant->stock_qty && $request->qty > $variant->stock_qty)) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Only ' . $variant->variant_stock_qty . ' items available in this variant'
-                    ]);
+            // ✅ IMPROVED: Stock check for variants or base product (including existing cart qty)
+            if (!empty($productVariantIDs)) {
+                // Check stock for products with variants
+                foreach ($productVariantIDs as $productVariantID) {
+                    $ProductVariant = Productvariant::find($productVariantID);
+
+                    if (!$ProductVariant) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Variant not found'
+                        ]);
+                    }
+
+                    // Find existing cart quantity for this variant combination
+                    $existingCartQty = 0;
+                    $existingCarts = Cart::where('product_id', $product->id)
+                        ->where('cart_session_id', $cart_session_id)
+                        ->whereNotNull('productvariant_ids')
+                        ->get();
+
+                    // Sort current request variants for comparison
+                    $currentVariants = $productVariantIDs;
+                    sort($currentVariants);
+
+                    foreach ($existingCarts as $existingCart) {
+                        $cartVariants = json_decode($existingCart->productvariant_ids, true);
+                        if ($cartVariants) {
+                            sort($cartVariants);
+                            if ($cartVariants == $currentVariants) {
+                                $existingCartQty = $existingCart->cart_qty;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Total quantity = existing cart qty + new request qty
+                    $totalQty = $existingCartQty + ($request->qty ?? 1);
+
+                    // Check if total exceeds stock
+                    if ($ProductVariant->stock_qty == 0) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'This variant is out of stock'
+                        ]);
+                    }
+
+                    if ($totalQty > $ProductVariant->stock_qty) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Cannot add to cart. Only ' . $ProductVariant->stock_qty . ' items available (you already have ' . $existingCartQty . ' in cart)'
+                        ]);
+                    }
                 }
             } else {
-                if ($product && $product->stock_qty && $request->qty > $product->stock_qty) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Only ' . $product->stock_qty . ' items available in stock'
-                    ]);
+                // Check stock for products without variants
+                if ($product) {
+                    // Find existing cart quantity for this product (without variants)
+                    $existingCart = Cart::where('product_id', $product->id)
+                        ->where('cart_session_id', $cart_session_id)
+                        ->whereNull('productvariant_ids')
+                        ->first();
+
+                    $existingCartQty = $existingCart ? $existingCart->cart_qty : 0;
+                    $totalQty = $existingCartQty + ($request->qty ?? 1);
+
+                    // Check if product has stock tracking
+                    if ($product->stock_qty !== null) {
+                        if ($product->stock_qty == 0) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'This product is out of stock'
+                            ]);
+                        }
+
+                        if ($totalQty > $product->stock_qty) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Cannot add to cart. Only ' . $product->stock_qty . ' items available (you already have ' . $existingCartQty . ' in cart)'
+                            ]);
+                        }
+                    }
                 }
             }
 
