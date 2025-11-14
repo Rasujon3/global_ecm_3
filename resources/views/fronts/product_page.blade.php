@@ -142,7 +142,7 @@
                                       <div class="product-action-vertical">
                                           @if (! $product->has_variants)
                                               <a href="#"
-                                                 class="btn-product-icon btn-cart add-to-cart"
+                                                 class="btn-product-icon btn-cart add-cart"
                                                  data-id="{{ $product->id }}"
                                                  title="Add to cart">
                                                   <i class="w-icon-cart"></i>
